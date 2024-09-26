@@ -7,12 +7,24 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // middleware
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://food-station-client.vercel.app/", // Add your production URL here
+];
+
 app.use(
   cors({
-    origin: "*",
+    origin: (origin, callback) => {
+      if (allowedOrigins.includes(origin) || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
+
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.6hyeg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
