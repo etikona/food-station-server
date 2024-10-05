@@ -226,7 +226,7 @@ async function run() {
 
 run().catch(console.dir);
 
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   res.send("food is coming");
 });
 
