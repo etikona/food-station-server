@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 // middleware
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://food-station-client.vercel.app"],
     credentials: true,
   })
 );
@@ -74,13 +74,13 @@ async function run() {
     // });
 
     //user related api
-    app.get("/api/users", async (req, res) => {
+    app.get("/users", async (req, res) => {
       const query = {};
       const users = await userCollection.find(query).toArray();
       res.send(users);
     });
 
-    app.post("/api/users", async (req, res) => {
+    app.post("/users", async (req, res) => {
       const user = req.body;
 
       const result = await userCollection.insertOne(user);
@@ -88,7 +88,7 @@ async function run() {
     });
 
     // Food related API
-    app.get("/api/food", async (req, res) => {
+    app.get("/food", async (req, res) => {
       const userEmail = req.query.email;
 
       try {
@@ -106,12 +106,12 @@ async function run() {
       }
     });
 
-    app.post("/api/food", async (req, res) => {
+    app.post("/food", async (req, res) => {
       const food = req.body;
       const result = await foodCollection.insertOne(food);
       res.send(result);
     });
-    app.get("/api/food/:id", async (req, res) => {
+    app.get("/food/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const food = await foodCollection.findOne(query);
@@ -119,7 +119,7 @@ async function run() {
       res.send(food);
     });
     // ! PATCH In FOOD
-    app.patch("/api/food/:id", async (req, res) => {
+    app.patch("/food/:id", async (req, res) => {
       try {
         const foodId = req.params.id;
         const updatedData = req.body;
@@ -153,7 +153,7 @@ async function run() {
     // app.put("/food?:id", async (req, res) => {
 
     // })
-    app.delete("/api/food/:id", async (req, res) => {
+    app.delete("/food/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const food = await foodCollection.deleteOne(query);
@@ -178,7 +178,7 @@ async function run() {
     //     res.status(500).send("Internal Server Error");
     //   }
     // });
-    app.get("/api/request", async (req, res) => {
+    app.get("/request", async (req, res) => {
       const query = {};
       const request = await requestCollection.find(query).toArray();
       res.send(request);
@@ -207,13 +207,13 @@ async function run() {
     });
 
     // ! Request POST
-    app.post("/api/request", async (req, res) => {
+    app.post("/request", async (req, res) => {
       const request = req.body;
       const result = await requestCollection.insertOne(request);
       res.send(result);
       // console.log(result);
     });
-    app.delete("/api/request/:id", async (req, res) => {
+    app.delete("/request/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const food = await requestCollection.deleteOne(query);
