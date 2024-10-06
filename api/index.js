@@ -26,6 +26,7 @@ const client = new MongoClient(uri, {
   },
 });
 
+// JWT verification middleware
 const verifyToken = (req, res, next) => {
   const token = req?.cookies?.token;
   if (!token) {
@@ -39,6 +40,9 @@ const verifyToken = (req, res, next) => {
     next();
   });
 };
+
+// Create a router for /app routes
+const appRouter = express.Router();
 
 async function run() {
   try {
@@ -64,19 +68,19 @@ async function run() {
     });
 
     // User related API routes under /app
-    app.get("/app/users", async (req, res) => {
+    appRouter.get("/users", async (req, res) => {
       const users = await userCollection.find({}).toArray();
       res.send(users);
     });
 
-    app.post("/app/users", async (req, res) => {
+    appRouter.post("/users", async (req, res) => {
       const user = req.body;
       const result = await userCollection.insertOne(user);
       res.send(result);
     });
 
     // Food related API routes under /app
-    app.get("/app/food", async (req, res) => {
+    appRouter.get("/food", async (req, res) => {
       const userEmail = req.query.email;
       try {
         let query = {};
@@ -91,20 +95,20 @@ async function run() {
       }
     });
 
-    app.post("/app/food", async (req, res) => {
+    appRouter.post("/food", async (req, res) => {
       const food = req.body;
       const result = await foodCollection.insertOne(food);
       res.send(result);
     });
 
-    app.get("/app/food/:id", async (req, res) => {
+    appRouter.get("/food/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const food = await foodCollection.findOne(query);
       res.send(food);
     });
 
-    app.patch("/app/food/:id", async (req, res) => {
+    appRouter.patch("/food/:id", async (req, res) => {
       try {
         const foodId = req.params.id;
         const updatedData = req.body;
@@ -128,20 +132,20 @@ async function run() {
       }
     });
 
-    app.delete("/app/food/:id", async (req, res) => {
+    appRouter.delete("/food/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const food = await foodCollection.deleteOne(query);
       res.send(food);
     });
 
-    // Request related API routes (you can prefix these with /app if needed)
-    app.get("/app/request", async (req, res) => {
+    // Request related API routes
+    appRouter.get("/request", async (req, res) => {
       const requests = await requestCollection.find({}).toArray();
       res.send(requests);
     });
 
-    app.get("/app/request/:email", async (req, res) => {
+    appRouter.get("/request/:email", async (req, res) => {
       const email = req.params.email;
       if (!email) {
         return res.status(400).send({ error: "Email parameter is missing" });
@@ -161,18 +165,21 @@ async function run() {
       }
     });
 
-    app.post("/app/request", async (req, res) => {
+    appRouter.post("/request", async (req, res) => {
       const request = req.body;
       const result = await requestCollection.insertOne(request);
       res.send(result);
     });
 
-    app.delete("/app/request/:id", async (req, res) => {
+    appRouter.delete("/request/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const request = await requestCollection.deleteOne(query);
       res.send(request);
     });
+
+    // Apply the /app prefix for all routes in appRouter
+    app.use("/app", appRouter);
   } catch (err) {
     console.error("Error during MongoDB operations:", err);
   }
