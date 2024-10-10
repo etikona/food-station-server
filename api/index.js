@@ -16,7 +16,7 @@ app.use(
 );
 app.use(express.json());
 
-const uri = `mongodb+srv://foodStation:oFzMMmwZAJ6jMxtx@cluster0.6hyeg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.6hyeg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -61,19 +61,19 @@ async function run() {
     });
 
     // User-related API
-    app.get("/users", async (req, res) => {
+    app.get("/api/users", async (req, res) => {
       const users = await userCollection.find({}).toArray();
       res.send(users);
     });
 
-    app.post("/users", async (req, res) => {
+    app.post("/api/users", async (req, res) => {
       const user = req.body;
       const result = await userCollection.insertOne(user);
       res.send(result);
     });
 
     // Food-related API
-    app.get("/food", async (req, res) => {
+    app.get("/api/food", async (req, res) => {
       const userEmail = req.query.email;
       let query = {};
       if (userEmail) {
@@ -83,19 +83,19 @@ async function run() {
       res.send(foods);
     });
 
-    app.post("/food", async (req, res) => {
+    app.post("/api/food", async (req, res) => {
       const food = req.body;
       const result = await foodCollection.insertOne(food);
       res.send(result);
     });
 
-    app.get("/food/:id", async (req, res) => {
+    app.get("/api/food/:id", async (req, res) => {
       const id = req.params.id;
       const food = await foodCollection.findOne({ _id: new ObjectId(id) });
       res.send(food);
     });
 
-    app.patch("/food/:id", async (req, res) => {
+    app.patch("/api/food/:id", async (req, res) => {
       const foodId = req.params.id;
       const updatedData = req.body;
 
@@ -115,19 +115,19 @@ async function run() {
       res.status(200).json({ message: "Food updated successfully!" });
     });
 
-    app.delete("/food/:id", async (req, res) => {
+    app.delete("/api/food/:id", async (req, res) => {
       const id = req.params.id;
       const food = await foodCollection.deleteOne({ _id: new ObjectId(id) });
       res.send(food);
     });
 
     // Request-related API
-    app.get("/request", async (req, res) => {
+    app.get("/api/request", async (req, res) => {
       const request = await requestCollection.find({}).toArray();
       res.send(request);
     });
 
-    app.get("/request/:email", async (req, res) => {
+    app.get("/api/request/:email", async (req, res) => {
       const email = req.params.email;
       const result = await requestCollection
         .find({ "donator.email": email })
@@ -140,13 +140,13 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/request", async (req, res) => {
+    app.post("/api/request", async (req, res) => {
       const request = req.body;
       const result = await requestCollection.insertOne(request);
       res.send(result);
     });
 
-    app.delete("/request/:id", async (req, res) => {
+    app.delete("/api/request/:id", async (req, res) => {
       const id = req.params.id;
       const food = await requestCollection.deleteOne({ _id: new ObjectId(id) });
       res.send(food);
